@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocky Protection | Get Key</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root {
+            --primary: #ff6b81;
+            --secondary: #2f3542;
+            --bg: #1e1e26;
+            --card-bg: #2d2d3a;
+            --text: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: #a4b0be;
+            margin-bottom: 25px;
+        }
+
+        .key-box {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border: 1px dashed var(--primary);
+            min-height: 25px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.3);
+        }
+
+        .btn:hover {
+            background: #ff4757;
+            box-shadow: 0 6px 20px rgba(255, 107, 129, 0.5);
+        }
+
+        .btn:disabled {
+            background: #57606f;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .timer {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #ff4757;
+        }
+
+        /* Particle Background Animation */
+        .bg-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-dots"></div>
+
+<div class="container animate__animated animate__fadeInUp">
+    <h1>Pocky Protection</h1>
+    <p>Script Lua Key System</p>
+    
+    <div class="key-box" id="keyDisplay">
+        Click button to generate key
+    </div>
+
+    <button class="btn" id="genBtn" onclick="generateKey()">Generate Key</button>
+    
+    <div class="timer" id="timerDisplay"></div>
+</div>
+
+<script>
+    const KEY_PREFIX = "STKEY_";
+    const EXPIRE_TIME = 50; // detik
+    let countdownInterval;
+
+    async function generateKey() {
+        const btn = document.getElementById('genBtn');
+        const keyDisplay = document.getElementById('keyDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+
+        // Ganti teks saat loading
+        btn.disabled = true;
+        keyDisplay.innerText = "Fetching...";
+
+        try {
+            // Mengambil data dari Pastefy (Raw)
+            const response = await fetch('https://pastefy.app/Re7HVaWF/raw');
+            const rawData = await response.text();
+            
+            // Logika acak sederhana dari teks pastefy
+            const words = rawData.split('\n');
+            const randomPart = words[Math.floor(Math.random() * words.length)].trim();
+            
+            // Gabungkan dengan prefix
+            const finalKey = KEY_PREFIX + randomPart + "_" + Math.floor(Math.random() * 1000);
+            
+            // Tampilkan Key
+            keyDisplay.innerText = finalKey;
+            keyDisplay.classList.add('animate__animated', 'animate__pulse');
+
+            // Set Expiration Logic
+            startTimer(EXPIRE_TIME);
+
+        } catch (error) {
+            keyDisplay.innerText = "Error fetching key!";
+            btn.disabled = false;
+        }
+    }
+
+    function startTimer(seconds) {
+        const timerDisplay = document.getElementById('timerDisplay');
+        const btn = document.getElementById('genBtn');
+        const keyDisplay = document.getElementById('keyDisplay');
+        
+        let timeLeft = seconds;
+        
+        clearInterval(countdownInterval);
+        
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = `Key expires in ${timeLeft}s`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                keyDisplay.innerText = "Key Expired!";
+                timerDisplay.innerText = "";
+                btn.disabled = false;
+                keyDisplay.classList.remove('animate__pulse');
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+  </html>
